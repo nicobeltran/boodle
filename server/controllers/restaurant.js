@@ -32,7 +32,7 @@ const pool = require('../db/database')
    */
   const getRestaurantById = async (req, res) => {
     try {
-        let restaurantId = req.params.restaurantId
+        const restaurantId = req.params.restaurantId
 
         const query = `SELECT r.restaurant_id, r.restaurant_name, r.restaurant_address, r.last_datetime_selected, 
         CASE WHEN count(ct.*) = 0 THEN '[]'::JSON ELSE json_agg(DISTINCT ct.cuisine_name) END AS cuisines 
@@ -49,7 +49,66 @@ const pool = require('../db/database')
     }
   }
 
+  const createRestaurant = async(req, res) => {
+    // body data format
+    //   {
+    //     "restaurant_data": {
+    //         "restaurantName": "Tomikawa",
+    //         "restaurantAddress": "14191 Jeffrey Rd, Irvine, CA 92620"
+    //     },
+    //     "cuisineIds": [3]
+    //   }
+    const restaurantData = req.body.restaurant_data
+      
+    const columns = {
+      restaurantName: 'restaurant_name',
+      restaurantAddress: 'restaurant_address'
+    }
+
+    try {
+      // pull out which columns needed to be inserted and what values
+      let columnsToInsert = ""
+      let valuesToInsert = ""
+
+      Object.keys(restaurantData).forEach((field, index) => {
+        if (index) {
+          columnsToInsert += ','
+          valuesToInsert += ','
+        }
+        columnsToInsert += `${columns[field]}`
+        valuesToInsert += `'${restaurantData[field]}'`
+      })
+
+      // Insert restaurant data into restaurants table
+      const insertRestaurantQuery = `INSERT INTO restaurants(${columnsToInsert}) VALUES (${valuesToInsert}) RETURNING *`
+      const {rows} = await pool.query(insertRestaurantQuery);
+
+      // pull out restaurant id once restaurant is made
+      const restaurantId = rows[0].restaurant_id
+
+      // insert into restaurant_cuisines to link restaurant to cuisine types
+      let restaurantCuisineValues = ""
+      let cuisineIds = req.body.cuisineIds
+      cuisineIds.forEach((cuisineId, index) => {
+        if (index) {
+          restaurantCuisineValues += ','
+        }
+        restaurantCuisineValues += `(${restaurantId}, ${cuisineId})`
+      })
+
+      const insertIntoRestaurantCuisinesQuery = `INSERT INTO restaurant_cuisines(restaurant_id, cuisine_id) VALUES ${restaurantCuisineValues}`
+      await pool.query(insertIntoRestaurantCuisinesQuery);
+
+      return res.status(200).json(rows)
+    }
+    catch (err) {
+      return res.status(500).json({ message: err.message })
+
+    }
+  }
+
   module.exports = {
     getAllRestaurants,
-    getRestaurantById
+    getRestaurantById,
+    createRestaurant
   }
