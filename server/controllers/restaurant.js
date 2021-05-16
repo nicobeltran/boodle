@@ -1,5 +1,5 @@
 const pool = require('../db/database')
-
+const util = require('../util/util')
   /**
    * Function to get all restaurants
    * @param req
@@ -19,7 +19,6 @@ const pool = require('../db/database')
         const {rows} = await pool.query(query);
           return res.status(200).json({ restaurants: rows })
       } catch (err) {
-          console.log(err)
           return res.status(500).json({ message: 'There was an error. Please try again later' })
       }
     }
@@ -44,11 +43,16 @@ const pool = require('../db/database')
         const {rows} = await pool.query(query);
         return res.status(200).json({ restaurant: rows[0] })
     } catch (err) {
-        console.log(err)
         return res.status(500).json({ message: 'There was an error. Please try again later' })
     }
   }
 
+    /**
+   * Function to create a new restaurant
+   * @param req
+   * @param res
+   * @return returns data from newly created restaurant
+   */
   const createRestaurant = async(req, res) => {
     // body data format
     //   {
@@ -67,39 +71,21 @@ const pool = require('../db/database')
 
     try {
       // pull out which columns needed to be inserted and what values
-      let columnsToInsert = ""
-      let valuesToInsert = ""
-
-      Object.keys(restaurantData).forEach((field, index) => {
-        if (index) {
-          columnsToInsert += ','
-          valuesToInsert += ','
-        }
-        columnsToInsert += `${columns[field]}`
-        valuesToInsert += `'${restaurantData[field]}'`
-      })
+      const colsAndValues = util.getInsertQueryColumnsAndValues(restaurantData, columns)
 
       // Insert restaurant data into restaurants table
-      const insertRestaurantQuery = `INSERT INTO restaurants(${columnsToInsert}) VALUES (${valuesToInsert}) RETURNING *`
+      const insertRestaurantQuery = `INSERT INTO restaurants(${colsAndValues.columnsToInsert}) VALUES (${colsAndValues.valuesToInsert}) RETURNING *`
       const {rows} = await pool.query(insertRestaurantQuery);
 
       // pull out restaurant id once restaurant is made
       const restaurantId = rows[0].restaurant_id
 
       // insert into restaurant_cuisines to link restaurant to cuisine types
-      let restaurantCuisineValues = ""
-      let cuisineIds = req.body.cuisineIds
-      cuisineIds.forEach((cuisineId, index) => {
-        if (index) {
-          restaurantCuisineValues += ','
-        }
-        restaurantCuisineValues += `(${restaurantId}, ${cuisineId})`
-      })
-
+      const restaurantCuisineValues = util.getInsertIntoStringForJunctionTables(restaurantId, req.body.cuisineIds)      
       const insertIntoRestaurantCuisinesQuery = `INSERT INTO restaurant_cuisines(restaurant_id, cuisine_id) VALUES ${restaurantCuisineValues}`
       await pool.query(insertIntoRestaurantCuisinesQuery);
 
-      return res.status(200).json(rows)
+      return res.status(200).json({rows})
     }
     catch (err) {
       return res.status(500).json({ message: err.message })
@@ -107,8 +93,33 @@ const pool = require('../db/database')
     }
   }
 
+  const updateRestaurant = async(req, res) => {
+    try {
+      const updatedData = req.body.restaurant_data
+      const restaurantId = req.body.restaurantId
+
+      const columns = {
+        restaurantName: 'restaurant_name',
+        restaurantAddress: 'restaurant_address'
+      }
+
+      let updateString = util.getFormattedUpdateString(updatedData, columns)
+
+      const query = `UPDATE restaurants
+                    SET ${updateString}
+                    WHERE restaurant_id = ${restaurantId};`
+
+      const {rows} = await pool.query(query);
+
+      return res.status(200).json({})
+    } catch (err) {
+      return res.status(500).json({ message: err.message })
+    }
+  }
+
   module.exports = {
     getAllRestaurants,
     getRestaurantById,
-    createRestaurant
+    createRestaurant,
+    updateRestaurant
   }
