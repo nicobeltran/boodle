@@ -10,6 +10,6 @@ const router = require('express').Router()
 router.get('/', getAllRestaurants)
 router.get('/:restaurantId', getRestaurantById)
 router.post('/', createRestaurant)
-router.put('/', updateRestaurant)
+router.put('/:restaurantId', updateRestaurant)
 
 module.exports = router;

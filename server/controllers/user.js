@@ -82,12 +82,10 @@ const pool = require('../db/database')
 
         // request body structure
         // {
-        //     "user_id": userId,
         //     "password": password,
         // }
-        const userId = req.body.userId
+        const userId = req.params.userId
         const password = req.body.password;
-
         const query = `UPDATE users 
                         SET password = '${password}'
                         WHERE user_id = ${userId};`
@@ -111,10 +109,9 @@ const pool = require('../db/database')
 
         // request body structure
         // {
-        //     "user_id": userId,
         //     "email": email,
         // }
-        const userId = req.body.userId
+        const userId = req.params.userId
         const email = req.body.email;
 
         const query = `UPDATE users 

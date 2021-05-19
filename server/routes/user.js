@@ -10,7 +10,7 @@ const router = require('express').Router()
 router.get('/', getAllUsers)
 router.get('/:userId', getUserById)
 router.post('/', createNewUser)
-router.put('/password', updateUserPassword)
-router.put('/email', updateUserEmail)
+router.put('/password/:userId', updateUserPassword)
+router.put('/email/:userId', updateUserEmail)
 
 module.exports = router;

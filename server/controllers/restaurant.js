@@ -56,13 +56,13 @@ const util = require('../util/util')
   const createRestaurant = async(req, res) => {
     // body data format
     //   {
-    //     "restaurant_data": {
+    //     "restaurantData": {
     //         "restaurantName": "Tomikawa",
     //         "restaurantAddress": "14191 Jeffrey Rd, Irvine, CA 92620"
     //     },
     //     "cuisineIds": [3]
     //   }
-    const restaurantData = req.body.restaurant_data
+    const restaurantData = req.body.restaurantData
       
     const columns = {
       restaurantName: 'restaurant_name',
@@ -94,9 +94,17 @@ const util = require('../util/util')
   }
 
   const updateRestaurant = async(req, res) => {
+    // body data format
+    //   {
+    //     "restaurantId": 1,
+    //     "restaurantData": {
+    //         "restaurantName": "McDonalds",
+    //         "restaurantAddress": "5445 Alton Pkwy, Irvine, CA 92614"
+    //     }
+    // }
     try {
-      const updatedData = req.body.restaurant_data
-      const restaurantId = req.body.restaurantId
+      const updatedData = req.body
+      const restaurantId = req.params.restaurantId
 
       const columns = {
         restaurantName: 'restaurant_name',

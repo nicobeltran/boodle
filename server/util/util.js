@@ -20,7 +20,16 @@ const getInsertQueryColumnsAndValues = (data, columns) => {
           valuesToInsert += ','
         }
         columnsToInsert += `${columns[field]}`
-        valuesToInsert += `'${data[field]}'`
+
+        // check the type of the data and format accordingly
+        let updateData = data[field]
+        switch (typeof(updateData)) {
+            case "number":
+                valuesToInsert += `${data[field]}`
+                break;
+            case "string": 
+                valuesToInsert += `'${data[field]}'`
+        }
     })
 
     return { columnsToInsert, valuesToInsert }
