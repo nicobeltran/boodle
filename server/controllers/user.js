@@ -6,16 +6,16 @@ const pool = require('../db/database')
  * @param res
  * @return list of users
  */
- const getAllUsers = async (req, res) => {
-    try {
-        const query = 'SELECT * FROM users ORDER BY user_id ASC;';
-        const {rows} = await pool.query(query);
-        return res.status(200).json({ users: rows })
-    } catch (err) {
-        console.log(err)
-        return res.status(500).json({ message: 'There was an error. Please try again later' })
-    }
+const getAllUsers = async (req, res) => {
+  try {
+    const query = 'SELECT * FROM users ORDER BY user_id ASC;';
+    const { rows } = await pool.query(query);
+    return res.status(200).json({ users: rows })
+  } catch (err) {
+    console.log(err)
+    return res.status(500).json({ message: 'There was an error. Please try again later' })
   }
+}
 
 /**
  * Function to get user by id
@@ -23,17 +23,40 @@ const pool = require('../db/database')
  * @param res
  * @return returns user with matching id
  */
-  const getUserById = async (req, res) => {
-    try {
-        let userId = req.params.userId
-        const query = `SELECT * FROM users WHERE user_id=${userId};`;
-        const {rows} = await pool.query(query);
-        return res.status(200).json({ user: rows[0] })
-    } catch (err) {
-        console.log(err)
-        return res.status(500).json({ message: 'There was an error. Please try again later' })
+const getUserById = async (req, res) => {
+  try {
+    let userId = req.params.userId
+    const query = `SELECT * FROM users WHERE user_id=${userId};`;
+    const { rows } = await pool.query(query);
+    return res.status(200).json({ user: rows[0] })
+  } catch (err) {
+    console.log(err)
+    return res.status(500).json({ message: 'There was an error. Please try again later' })
+  }
+}
+
+const postUserByEmailAndPassword = async (req, res) => {
+  try {
+    let email = req.body.email
+    let password = req.body.password
+    const query = `SELECT user_id,email, first_name, last_name FROM users WHERE email = '${email}' AND password='${password}';`;
+    const { rows } = await pool.query(query);
+
+    console.log(rows)
+
+    if (rows[0]) {
+      return res.status(200).json({ user: rows[0] })
     }
-  }  
+    else {
+      console.log("400")
+      return res.status(400).json({ message: "User not found in system."})
+    }
+
+  } catch (err) {
+    console.log(err)
+    return res.status(500).json({ message: 'There was an error. Please try again later' })
+  }
+}
 
 /**
  * Function to create new user
@@ -41,96 +64,97 @@ const pool = require('../db/database')
  * @param res
  * @return returns new user data 
  */
-  const createNewUser = async (req, res) => {
-    try {
+const createNewUser = async (req, res) => {
+  try {
 
-        // request body structure
-        // {
-        //     "email": "jane@gmail.com",
-        //     "password": "passwordsrcool",
-        //     "firstName": "Jane",
-        //     "lastName": "Doe"
-        // }
-        const email = req.body.email;
-        const password = req.body.password;
-        const firstName = req.body.firstName;
-        const lastName = req.body.lastName;
+    // request body structure
+    // {
+    //     "email": "jane@gmail.com",
+    //     "password": "passwordsrcool",
+    //     "firstName": "Jane",
+    //     "lastName": "Doe"
+    // }
+    const email = req.body.email;
+    const password = req.body.password;
+    const firstName = req.body.firstName;
+    const lastName = req.body.lastName;
 
-        const query = `INSERT INTO users(email, password, first_name, last_name) 
+    const query = `INSERT INTO users(email, password, first_name, last_name) 
                         VALUES ('${email}', '${password}', '${firstName}', '${lastName}') 
                         RETURNING *;`
-        const {rows} = await pool.query(query)
+    const { rows } = await pool.query(query)
 
-        const responseData = {
-            Done: rows[0]
-        }
+    const responseData = {
+      Done: rows[0]
+    }
 
-        res.status(200).json(responseData)
-    }
-    catch (err) {
-        return res.status(500).json({ message: err.message })
-    }
+    res.status(200).json(responseData)
   }
+  catch (err) {
+    return res.status(500).json({ message: err.message })
+  }
+}
 
 /**
  * Function to update user password
  * @param req
  * @param res
  */
-  const updateUserPassword = async (req, res) => {
-    try {
+const updateUserPassword = async (req, res) => {
+  try {
 
-        // request body structure
-        // {
-        //     "password": password,
-        // }
-        const userId = req.params.userId
-        const password = req.body.password;
-        const query = `UPDATE users 
+    // request body structure
+    // {
+    //     "password": password,
+    // }
+    const userId = req.params.userId
+    const password = req.body.password;
+    const query = `UPDATE users 
                         SET password = '${password}'
                         WHERE user_id = ${userId};`
-        const {rows} = await pool.query(query)
+    const { rows } = await pool.query(query)
 
-        res.status(200).json(rows)
-    }
-    catch (err) {
-        console.log(err)
-        return res.status(500).json({ message: err.message })
-    }
+    res.status(200).json(rows)
   }
+  catch (err) {
+    console.log(err)
+    return res.status(500).json({ message: err.message })
+  }
+}
 
-  /**
- * Function to get update user email
- * @param req
- * @param res
- */
-   const updateUserEmail = async (req, res) => {
-    try {
+/**
+* Function to get update user email
+* @param req
+* @param res
+*/
+const updateUserEmail = async (req, res) => {
+  try {
 
-        // request body structure
-        // {
-        //     "email": email,
-        // }
-        const userId = req.params.userId
-        const email = req.body.email;
+    // request body structure
+    // {
+    //     "email": email,
+    // }
+    const userId = req.params.userId
+    const email = req.body.email;
 
-        const query = `UPDATE users 
+    const query = `UPDATE users 
                         SET email = '${email}'
                         WHERE user_id = ${userId};`
-        const {rows} = await pool.query(query)
+    const { rows } = await pool.query(query)
 
-        res.status(200).json(rows)
-    }
-    catch (err) {
-        console.log(err)
-        return res.status(500).json({ message: err.message })
-    }
+    res.status(200).json(rows)
   }
+  catch (err) {
+    console.log(err)
+    return res.status(500).json({ message: err.message })
+  }
+}
 
-  module.exports = {
-      getAllUsers,
-      getUserById,
-      createNewUser,
-      updateUserPassword,
-      updateUserEmail
-  }
+module.exports = {
+  getAllUsers,
+  getUserById,
+  postUserByEmailAndPassword,
+  createNewUser,
+  updateUserPassword,
+  updateUserEmail
+}
