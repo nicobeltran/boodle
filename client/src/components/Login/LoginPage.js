@@ -46,9 +46,9 @@ class LoginPage extends Component {
                     if (res.status === 200) {
                         const user = res.data.user
                         this.props.history.push({
-                            pathname: "/myrestaurantlists",
+                            pathname: "/boodles",
                             state: { user }})
-                        // navigate to restaurant lists dashboard
+                        // navigate to boodle list dashboard
                     }
                 }
                 catch (error) {
@@ -107,9 +107,9 @@ class LoginPage extends Component {
 
                 <Row>
                     <Col>
-                        <Button variant="primary" type="submit">
+                        <Button variant="success" type="submit">
                             Submit
-                    </Button>
+                        </Button>
                     </Col>
                 </Row>
 

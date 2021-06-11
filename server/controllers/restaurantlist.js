@@ -10,10 +10,12 @@ const util = require('../util/util')
     const getRestaurantListsByUserId = async (req, res) => {
         try {
             let userId = req.params.userId
-            const query = `SELECT restaurant_list.restaurant_list_id, list_name, created_by_id, created_on 
+            const query = `SELECT restaurant_list.restaurant_list_id, list_name, created_by_id, created_on, users.first_name, users.last_name
                             FROM users_restaurantlist
                             INNER JOIN restaurant_list ON users_restaurantlist.restaurant_list_id = restaurant_list.restaurant_list_id
-                            WHERE users_restaurantlist.user_id = ${userId};`
+                            INNER JOIN users ON users.user_id = restaurant_list.created_by_id
+                            WHERE users_restaurantlist.user_id = ${userId}
+                            ORDER BY created_on ASC;`
 
             const {rows} = await pool.query(query);
             return res.status(200).json({ restaurant_lists: rows })

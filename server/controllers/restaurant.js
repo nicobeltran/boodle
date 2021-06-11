@@ -29,7 +29,7 @@ const util = require('../util/util')
    * @param res
    * @return returns data for a single restaurant with matching ID
    */
-  const getRestaurantById = async (req, res) => {
+  const getRestaurantByRestaurantId = async (req, res) => {
     try {
         const restaurantId = req.params.restaurantId
 
@@ -37,11 +37,40 @@ const util = require('../util/util')
         CASE WHEN count(ct.*) = 0 THEN '[]'::JSON ELSE json_agg(DISTINCT ct.cuisine_name) END AS cuisines 
         FROM restaurants r 
         JOIN restaurant_cuisines rc ON r.restaurant_id = rc.restaurant_id 
-        JOIN cuisine_types ct ON rc.cuisine_id = ct.cuisine_id WHERE r.restaurant_id = ${restaurantId} 
+        JOIN cuisine_types ct ON rc.cuisine_id = ct.cuisine_id 
+        WHERE r.restaurant_id = ${restaurantId} 
         GROUP BY r.restaurant_id;`
 
         const {rows} = await pool.query(query);
         return res.status(200).json({ restaurant: rows[0] })
+    } catch (err) {
+        return res.status(500).json({ message: 'There was an error. Please try again later' })
+    }
+  }
+
+  /**
+   * Function to get restaurants by a restaurant list ID
+   * @param req
+   * @param res
+   * @return returns all restaurants linked to the restaurant list ID
+   */
+  const getRestaurantsByRestaurantListId = async (req, res) => {
+    try {
+        const restaurantListId = req.params.restaurantListId
+
+        const query = `SELECT r.restaurant_id, restaurant_name, restaurant_address, last_datetime_selected,
+                        CASE WHEN count(ct.*) = 0 THEN '[]'::JSON ELSE json_agg(DISTINCT ct.cuisine_name) END AS cuisines 
+                        FROM restaurants r
+                        JOIN restaurant_cuisines rc ON r.restaurant_id = rc.restaurant_id
+                        JOIN cuisine_types ct ON rc.cuisine_id = ct.cuisine_id
+                        JOIN restaurantList_restaurant ON r.restaurant_id = restaurantlist_restaurant.restaurant_id
+                        WHERE restaurant_list_id = ${restaurantListId}
+                        GROUP BY r.restaurant_id
+                        ORDER BY restaurant_name ASC`;
+
+        const {rows} = await pool.query(query);
+        return res.status(200).json({ restaurants: rows })
+
     } catch (err) {
         return res.status(500).json({ message: 'There was an error. Please try again later' })
     }
@@ -127,7 +156,8 @@ const util = require('../util/util')
 
   module.exports = {
     getAllRestaurants,
-    getRestaurantById,
+    getRestaurantByRestaurantId,
+    getRestaurantsByRestaurantListId,
     createRestaurant,
     updateRestaurant
   }

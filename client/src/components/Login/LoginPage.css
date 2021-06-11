@@ -6,15 +6,20 @@ h1 {
     margin-bottom: 20px;
 }
 
-.btn-primary {
-    color: #fff;
+.FormLabel {
+    text-align: left;
+}
+
+.btn-success {
+    color: #FBF9F9;
     background-color: #2bbf78;
     border-color: #2bbf78;
     margin-bottom: 10px;
 }
 
-.btn-primary:hover {
+.btn-success:hover {
     color: #fff;
     background-color: #218F5A;
     border-color: #218F5A;
 }
+

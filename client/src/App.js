@@ -1,7 +1,8 @@
 import './App.css';
 import HomePage from './components/HomePage/HomePage'
 import LoginPage from './components/Login/LoginPage';
-import RestaurantListPage from './components/RestaurantListPage/RestaurantListPage';
+import BoodlesPage from './components/BoodlePage/BoodlesPage';
+import BoodleDetailsPage from './components/BoodlePage/BoodleDetailsPage';
 
 import {
   BrowserRouter as Router,
@@ -18,8 +19,12 @@ class App extends Component {
           <Switch>
             <Route exact path="/" component={HomePage} />
             <Route path="/login" component={LoginPage} />
-            <Route path="/myrestaurantlists" component={RestaurantListPage} />
-            {/* <Route path="/signup" component={LoginPage}/> */}
+
+            <Route path="/boodle/:id" component={BoodleDetailsPage}/>
+            <Route path="/boodles" component={BoodlesPage}/>
+
+            {/* Fall back route */}
+            <Route exact path="/" component={HomePage} />
           </Switch>
         </div>
       </Router>

@@ -1,0 +1,103 @@
+.DashboardHeader {
+    background-color: #2BBF78;
+}
+
+.DashboardHeaderTitle {
+    text-align: left;
+    margin-top: 10px;
+    margin-left: 30px;
+    color: #FBF9F9;
+}
+
+.DashboardDropdownButton {
+    text-align: right;
+    margin-top: 20px;
+    margin-right: 0px;
+    color: #FBF9F9
+}
+
+.BoodlesListTitle {
+    margin-top: 30px;
+    margin-left: 0px;
+    text-align: left;
+    color:#201526;
+}
+
+.BoodlesListItem {
+    margin-bottom: 25px;
+    padding: 25px 20px;
+    text-align: left;
+    border: 1px solid#201526;
+    color:#201526;
+    border-radius: 5px;
+}
+
+.BoodlesListItem:hover {
+    background: #FDFDFD;
+    cursor: pointer;
+}
+
+.BoodleTitle {
+    margin-top: 10px;
+    margin-left: 15px;
+    text-align: left;
+    color:#201526;
+}
+
+.BoodleRestaurantItem {
+    text-align: left;
+    margin-right: 10px;
+    margin-bottom: 20px;
+    border: 1px solid#201526;
+    color:#201526;
+    border-radius: 5px;
+    padding: 20px;
+}
+
+.BoodleRestaurantItem:hover {
+    background: #FDFDFD;
+    /* cursor: pointer; */
+}
+
+.BackButtonArrow {
+    color: #86AE91;
+}
+
+.LinkBackButton {
+    text-decoration-color: #86AE91;
+    text-underline-offset: 6px;
+}
+
+.BackButtonText {
+    margin-top: 15px;
+    color:#86AE91;
+}
+.BackButtonText:hover {
+    margin-top: 15px;
+    color:#2BBF78;
+}
+
+.RestaurantSearchBarInput {
+    float: right;
+    clear: both;
+    margin-right: 20px;
+    vertical-align: center;
+}
+
+.AddRestaurantButton {
+    float: right;
+    clear: both;
+    margin-right: 20px;
+    margin-top: 25px;
+    
+    align-content: center;
+}
+
+.AddRestaurantIcon {
+    margin-bottom: 5px;
+}
+
+.CuisineText {
+    color: #7A7769;
+}
+
